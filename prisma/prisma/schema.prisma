@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum kategori{
+  SAPI
+  KAMBING
+}
+
+enum pembayaran{
+  TRANSFER
+  COD
+}
+
+model transaksi{
+  id_trans          Int @id @default(autoincrement())
+  tgl_transaksi     DateTime @default(now())
+  pelanggan         pelanggan? @relation(fields: [idpelanggan], references: [id_pelanggan])
+  idpelanggan       Int
+  total_bayar       Int
+  status_bayar      Boolean @default(true)
+  pembayaran        pembayaran @default(COD)
+  hewan             hewan? @relation(fields: [idhewan], references: [id_hewan])
+  idhewan           Int
+  detail_transaksi  detail_transaksi[]
+}
+
+model pelanggan{
+  id_pelanggan      Int @id @default(autoincrement())
+  nama              String @default("")
+  username          String @default("")
+  password          String @default("")
+  alamat            String @default("")
+  nomor_hp          String @default("")
+  email             String @default("")
+  transaksi         transaksi[]
+}
+
+model hewan{
+  id_hewan          Int @id @default(autoincrement())
+  berat             Int
+  umur              Int
+  harga             Int
+  kategori          kategori @default(SAPI)
+  jenis             String @default("")
+  foto              String @default("")
+  penjual           penjual? @relation(fields: [id_penjual], references: [id_penjual])
+  id_penjual        Int
+  detail_transaksi  detail_transaksi[]
+
+  transaksi transaksi[]
+}
+
+model penjual{
+  id_penjual        Int @id @default(autoincrement())
+  nama              String @default("")
+  password          String @default("")
+  alamat            String @default("")
+  nomor_hp          String @default("")
+  email             String @default("")
+  hewan             hewan[]
+}
+
+model admin{
+  id                Int @id @default(autoincrement())
+  password          String @default("")
+  username          String @default("")
+  nama              String @default("")
+}
+
+model detail_transaksi{
+  id_detail         Int @id @default(autoincrement())
+  transaksi         transaksi? @relation(fields: [idtransaksi], references: [id_trans])
+  idtransaksi       Int
+  hewan             hewan @relation(fields: [idhewan], references: [id_hewan])
+  idhewan           Int
+  jumlah            Int
+  uid               String @default("")
+}
+
